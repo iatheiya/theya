@@ -4,7 +4,7 @@ on:
     branches:
       - main
       - master
-  workflow_dispatch:
+  workflow_dispatch: {}
 
 jobs:
   generate:
@@ -16,36 +16,84 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          distribution: temurin
+          distribution: 'temurin'
           java-version: '17'
+
+      - name: Setup Gradle (needed for fallback generation)
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.2.1'
 
       - name: Create gradle wrapper directory
         run: mkdir -p gradle/wrapper
 
-      - name: Download gradle-wrapper.jar (official)
+      - name: Ensure gradle-wrapper.jar (download or generate fallback)
         run: |
-          curl -fsSL -o gradle/wrapper/gradle-wrapper.jar https://services.gradle.org/distributions/gradle-9.2.1-wrapper.jar
-          ls -l gradle/wrapper/
+          set -euo pipefail
+          mkdir -p gradle/wrapper
+          echo "Trying to download gradle-9.2.1-wrapper.jar from services.gradle.org..."
+          if curl -fsSL -o gradle/wrapper/gradle-wrapper.jar https://services.gradle.org/distributions/gradle-9.2.1-wrapper.jar; then
+            echo "Downloaded gradle-wrapper.jar from services.gradle.org."
+          else
+            echo "Download failed, attempting to generate wrapper using Gradle CLI..."
+            gradle wrapper --gradle-version 9.2.1 --no-daemon || {
+              echo "gradle wrapper failed — creating minimal wrapper jar using published wrapper JAR location as last resort"
+              if curl -fsSL -o gradle/wrapper/gradle-wrapper.jar https://services.gradle.org/distributions/gradle-wrapper.jar; then
+                echo "Downloaded fallback gradle-wrapper.jar"
+              else
+                echo "All attempts failed. Exiting with non-zero to make failure visible."
+                exit 1
+              fi
+            }
+          fi
+          ls -l gradle/wrapper || true
 
       - name: Create gradle-wrapper.properties
         run: |
-          printf '%s\n' 'distributionBase=GRADLE_USER_HOME' 'distributionPath=wrapper/dists' 'distributionUrl=https\://services.gradle.org/distributions/gradle-9.2.1-bin.zip' 'zipStoreBase=GRADLE_USER_HOME' 'zipStorePath=wrapper/dists' > gradle/wrapper/gradle-wrapper.properties
+          mkdir -p gradle/wrapper
+          cat > gradle/wrapper/gradle-wrapper.properties <<'EOF'
+distributionBase=GRADLE_USER_HOME
+distributionPath=wrapper/dists
+distributionUrl=https\://services.gradle.org/distributions/gradle-9.2.1-bin.zip
+zipStoreBase=GRADLE_USER_HOME
+zipStorePath=wrapper/dists
+EOF
           ls -l gradle/wrapper/gradle-wrapper.properties
 
-      - name: Create gradlew (UNIX)
+      - name: Ensure gradlew (UNIX)
         run: |
-          printf '%s\n' '#!/usr/bin/env sh' 'set -e' 'DIR="$(cd "$(dirname "$0")" && pwd)"' 'java -jar "$DIR/gradle/wrapper/gradle-wrapper.jar" "$@"' > gradlew
-          chmod +x gradlew
+          if [ ! -f gradlew ]; then
+            cat > gradlew <<'EOF'
+#!/usr/bin/env sh
+set -e
+DIR="$(cd "$(dirname "$0")" && pwd)"
+java -jar "$DIR/gradle/wrapper/gradle-wrapper.jar" "$@"
+EOF
+            chmod +x gradlew
+          fi
           ls -l gradlew
 
-      - name: Create gradlew.bat (Windows)
+      - name: Ensure gradlew.bat (Windows)
         run: |
-          printf '%s\n' '@echo off' 'setlocal' 'set DIR=%~dp0' 'java -jar "%DIR%gradle\\wrapper\\gradle-wrapper.jar" %*' 'endlocal' > gradlew.bat
+          if [ ! -f gradlew.bat ]; then
+            cat > gradlew.bat <<'EOF'
+@echo off
+setlocal
+set DIR=%~dp0
+java -jar "%DIR%gradle\wrapper\gradle-wrapper.jar" %*
+endlocal
+EOF
+          fi
           ls -l gradlew.bat
 
-      - name: Create settings.gradle.kts
+      - name: Create settings.gradle.kts if missing
         run: |
-          printf '%s\n' 'rootProject.name = "Theya"' 'include(":app")' > settings.gradle.kts
+          if [ ! -f settings.gradle.kts ]; then
+            cat > settings.gradle.kts <<'EOF'
+rootProject.name = "Theya"
+include(":app")
+EOF
+          fi
           ls -l settings.gradle.kts
 
       - name: Upload gradle wrapper files
