@@ -5,35 +5,68 @@ on:
     branches:
       - main
       - master
+
 jobs:
   generate:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
+
       - name: Create gradle wrapper directory
         run: mkdir -p gradle/wrapper
-      - name: Download wrapper jar
+
+      - name: Download gradle-wrapper.jar (official)
         run: |
-          curl -sSLO https://services.gradle.org/distributions/gradle-9.2.1-bin.zip
-          unzip -q gradle-9.2.1-bin.zip
-          cp -v gradle-9.2.1/lib/gradle-wrapper.jar gradle/wrapper/
-          rm -f gradle-9.2.1-bin.zip
-      - name: Create gradlew
+          curl -fsSL -o gradle/wrapper/gradle-wrapper.jar https://services.gradle.org/distributions/gradle-9.2.1-wrapper.jar
+          ls -l gradle/wrapper/
+
+      - name: Create gradle-wrapper.properties
         run: |
-          printf '%s\n' '#!/usr/bin/env sh' 'set -e' 'java -jar "$(dirname "$0")/gradle/wrapper/gradle-wrapper.jar" "$@"' > gradlew
+          cat > gradle/wrapper/gradle-wrapper.properties <<'EOF'
+distributionBase=GRADLE_USER_HOME
+distributionPath=wrapper/dists
+distributionUrl=https\://services.gradle.org/distributions/gradle-9.2.1-bin.zip
+zipStoreBase=GRADLE_USER_HOME
+zipStorePath=wrapper/dists
+EOF
+
+      - name: Create gradlew (UNIX)
+        run: |
+          cat > gradlew <<'EOF'
+#!/usr/bin/env sh
+set -e
+DIR="$(cd "$(dirname "$0")" && pwd)"
+java -jar "$DIR/gradle/wrapper/gradle-wrapper.jar" "$@"
+EOF
           chmod +x gradlew
-      - name: Create gradlew.bat
+          ls -l gradlew
+
+      - name: Create gradlew.bat (Windows)
         run: |
-          printf '%s\n' '@echo off' 'java -jar "%~dp0gradle\\wrapper\\gradle-wrapper.jar" %*' > gradlew.bat
+          cat > gradlew.bat <<'EOF'
+@echo off
+setlocal
+set DIR=%~dp0
+java -jar "%DIR%gradle\\wrapper\\gradle-wrapper.jar" %*
+endlocal
+EOF
+          ls -l gradlew.bat
+
       - name: Create settings.gradle.kts
         run: |
-          printf '%s\n' 'rootProject.name = "Theya"' 'include(":app")' > settings.gradle.kts
+          cat > settings.gradle.kts <<'EOF'
+rootProject.name = "Theya"
+include(":app")
+EOF
+          ls -l settings.gradle.kts
+
       - name: Upload gradle wrapper files
         uses: actions/upload-artifact@v4
         with:
