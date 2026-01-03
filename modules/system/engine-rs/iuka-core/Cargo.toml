@@ -1,0 +1,12 @@
+[package]
+name = "iuka-core"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+theya-pty = { path = "../theya-pty" }
+theya-bridge = { path = "../theya-bridge" }
+theya-utils = { path = "../theya-utils" }
+tokio = { workspace = true }
+anyhow = { workspace = true }
+log = { workspace = true }
