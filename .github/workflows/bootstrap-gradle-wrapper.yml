@@ -1,7 +1,7 @@
 name: Bootstrap Gradle Wrapper and Commit
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -31,7 +31,6 @@ jobs:
 
       - name: Ensure gradle/wrapper dir exists
         run: |
-          set -euo pipefail
           mkdir -p gradle/wrapper
 
       - name: Download Gradle distribution and extract gradle-wrapper.jar (if missing)
@@ -39,11 +38,7 @@ jobs:
           set -euo pipefail
           if [ ! -f gradle/wrapper/gradle-wrapper.jar ]; then
             echo "Downloading gradle-${GRADLE_VERSION}..."
-            curl -fsSLo gradle.zip "https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip"
-            if [ ! -f gradle.zip ]; then
-              echo "ERROR: failed to download gradle distribution" >&2
-              exit 1
-            fi
+            curl -sSLo gradle.zip "https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip"
             unzip -q gradle.zip
             if [ -f "gradle-${GRADLE_VERSION}/lib/gradle-wrapper.jar" ]; then
               cp "gradle-${GRADLE_VERSION}/lib/gradle-wrapper.jar" gradle/wrapper/gradle-wrapper.jar
@@ -63,7 +58,7 @@ jobs:
         run: |
           set -euo pipefail
           if [ ! -f ./gradlew ]; then
-            cat > ./gradlew <<'GRADLE_SH'
+            cat > ./gradlew <<'SH'
 #!/usr/bin/env sh
 set -e
 DIRNAME="$(cd "$(dirname "$0")" && pwd)"
@@ -74,7 +69,7 @@ if [ ! -f "$GRADLE_WRAPPER_JAR" ]; then
   exit 1
 fi
 exec java -jar "$GRADLE_WRAPPER_JAR" "$@"
-GRADLE_SH
+SH
             chmod +x ./gradlew
             echo "Created ./gradlew"
           else
@@ -85,18 +80,18 @@ GRADLE_SH
         run: |
           set -euo pipefail
           if [ ! -f ./gradlew.bat ]; then
-            cat > ./gradlew.bat <<'GRADLE_BAT'
+            cat > ./gradlew.bat <<'BAT'
 @echo off
 setlocal
 set SCRIPT_DIR=%~dp0
-set GRADLE_WRAPPER_JAR=%SCRIPT_DIR%gradle\wrapper\gradle-wrapper.jar
+set GRADLE_WRAPPER_JAR=%SCRIPT_DIR%gradlewrappergradle-wrapper.jar
 if not exist "%GRADLE_WRAPPER_JAR%" (
   echo ERROR: gradle-wrapper.jar is missing at %GRADLE_WRAPPER_JAR%
   echo Run: gradle wrapper --gradle-version 9.2.1
   exit /b 1
 )
 java -jar "%GRADLE_WRAPPER_JAR%" %*
-GRADLE_BAT
+BAT
             echo "Created ./gradlew.bat"
           else
             echo "./gradlew.bat already exists; skipping"
@@ -106,28 +101,27 @@ GRADLE_BAT
         run: |
           set -euo pipefail
           if [ ! -f ./settings.gradle.kts ]; then
-            cat > settings.gradle.kts <<'SETTINGS_KTS'
+            cat > settings.gradle.kts <<'KTS'
 pluginManagement {
-    includeBuild("build-logic")
-    repositories {
-        google()
-        mavenCentral()
-        gradlePluginPortal()
-    }
+  includeBuild("build-logic")
+  repositories {
+    google()
+    mavenCentral()
+    gradlePluginPortal()
+  }
 }
 
 dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-    repositories {
-        google()
-        mavenCentral()
-    }
+  repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+  repositories {
+    google()
+    mavenCentral()
+  }
 }
 
 rootProject.name = "Theya"
 
 include(":app")
-
 include(":modules:system:glue-jni")
 
 include(":modules:core:common")
@@ -144,7 +138,7 @@ include(":modules:features:bridge-explorer")
 include(":modules:features:shell-setup")
 
 include(":modules:runtime:session-service")
-SETTINGS_KTS
+KTS
             echo "Created settings.gradle.kts"
           else
             echo "settings.gradle.kts already exists; skipping"
@@ -152,9 +146,8 @@ SETTINGS_KTS
 
       - name: Show status (debug)
         run: |
-          set -euo pipefail
           echo "Files in repo root (preview):"
-          ls -la | sed -n '1,200p' || true
+          ls -la | sed -n '1,200p'
           echo ""
           echo "gradle/wrapper contents:"
           ls -la gradle/wrapper || true
@@ -173,6 +166,7 @@ SETTINGS_KTS
           else
             BRANCH="${GITHUB_REF#refs/heads/}"
           fi
+
           echo "Target branch for push: $BRANCH"
 
           git add gradlew gradlew.bat gradle/wrapper/gradle-wrapper.jar settings.gradle.kts || true
