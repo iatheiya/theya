@@ -10,11 +10,12 @@ on:
 env:
   GRADLE_VERSION: "9.2.1"
 
+permissions:
+  contents: write
+
 jobs:
   bootstrap-wrapper:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
 
     steps:
       - name: Checkout repository (allow pushing)
@@ -23,7 +24,7 @@ jobs:
           persist-credentials: true
           fetch-depth: 0
 
-      - name: Set up tools
+      - name: Set up JDK
         uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -45,6 +46,8 @@ jobs:
               echo "gradle-wrapper.jar installed to gradle/wrapper/"
             else
               echo "ERROR: gradle-wrapper.jar not found inside distribution." >&2
+              ls -la "gradle-${GRADLE_VERSION}" || true
+              rm -f gradle.zip || true
               exit 1
             fi
             rm -rf "gradle-${GRADLE_VERSION}" gradle.zip
@@ -55,7 +58,7 @@ jobs:
       - name: Create gradlew (if missing)
         run: |
           set -euo pipefail
-          if [ ! -f "./gradlew" ]; then
+          if [ ! -f ./gradlew ]; then
             cat > ./gradlew <<'SH'
 #!/usr/bin/env sh
 set -e
@@ -63,7 +66,7 @@ DIRNAME="$(cd "$(dirname "$0")" && pwd)"
 GRADLE_WRAPPER_JAR="$DIRNAME/gradle/wrapper/gradle-wrapper.jar"
 if [ ! -f "$GRADLE_WRAPPER_JAR" ]; then
   echo "ERROR: gradle-wrapper.jar is missing at $GRADLE_WRAPPER_JAR"
-  echo "Please run: gradle wrapper --gradle-version ${GRADLE_VERSION}"
+  echo "Please run: gradle wrapper --gradle-version 9.2.1"
   exit 1
 fi
 exec java -jar "$GRADLE_WRAPPER_JAR" "$@"
@@ -77,7 +80,7 @@ SH
       - name: Create gradlew.bat (if missing)
         run: |
           set -euo pipefail
-          if [ ! -f "./gradlew.bat" ]; then
+          if [ ! -f ./gradlew.bat ]; then
             cat > ./gradlew.bat <<'BAT'
 @echo off
 setlocal
@@ -85,7 +88,7 @@ set SCRIPT_DIR=%~dp0
 set GRADLE_WRAPPER_JAR=%SCRIPT_DIR%gradle\wrapper\gradle-wrapper.jar
 if not exist "%GRADLE_WRAPPER_JAR%" (
   echo ERROR: gradle-wrapper.jar is missing at %GRADLE_WRAPPER_JAR%
-  echo Run: gradle wrapper --gradle-version %GRADLE_VERSION%
+  echo Run: gradle wrapper --gradle-version 9.2.1
   exit /b 1
 )
 java -jar "%GRADLE_WRAPPER_JAR%" %*
@@ -98,7 +101,7 @@ BAT
       - name: Create minimal settings.gradle.kts if missing
         run: |
           set -euo pipefail
-          if [ ! -f "./settings.gradle.kts" ]; then
+          if [ ! -f ./settings.gradle.kts ]; then
             cat > settings.gradle.kts <<'KTS'
 pluginManagement {
     includeBuild("build-logic")
@@ -145,7 +148,7 @@ KTS
 
       - name: Show status (debug)
         run: |
-          echo "Files in repo root:"
+          echo "Files in repo root (preview):"
           ls -la | sed -n '1,200p'
           echo ""
           echo "gradle/wrapper contents:"
@@ -160,7 +163,6 @@ KTS
           git config user.name "$GIT_AUTHOR_NAME"
           git config user.email "$GIT_AUTHOR_EMAIL"
 
-          # Detect current branch (support push and workflow_dispatch / PR contexts)
           if [ -n "${GITHUB_HEAD_REF:-}" ]; then
             BRANCH="$GITHUB_HEAD_REF"
           else
@@ -177,7 +179,6 @@ KTS
 
           git commit -m "chore: add Gradle wrapper (gradlew, gradlew.bat, gradle-wrapper.jar) and settings if missing" || true
 
-          # Try push; if push fails due to branch protection, emit helpful message and fail
           if git push origin "HEAD:$BRANCH"; then
             echo "Successfully pushed Gradle wrapper files to branch $BRANCH"
           else
@@ -188,4 +189,4 @@ KTS
 
       - name: Final info
         run: |
-          echo "Bootstrap job finished. If push succeeded, gradle wrapper files are now in the repository."
+          echo "Bootstrap job finished."
