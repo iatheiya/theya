@@ -1,6 +1,6 @@
 name: Bootstrap Gradle Wrapper
 on:
-  workflow_dispatch:
+  workflow_dispatch: {}
   push:
     branches:
       - main
@@ -54,7 +54,7 @@ EOF
 @echo off
 setlocal
 set DIR=%~dp0
-java -jar "%DIR%gradle\\wrapper\\gradle-wrapper.jar" %*
+java -jar "%DIR%gradle\wrapper\gradle-wrapper.jar" %*
 endlocal
 EOF
           ls -l gradlew.bat
