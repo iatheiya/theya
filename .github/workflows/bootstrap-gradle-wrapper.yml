@@ -57,7 +57,7 @@ jobs:
         run: |
           set -euo pipefail
           if [ ! -f ./gradlew ]; then
-            cat > ./gradlew <<'SH'
+            cat > ./gradlew << 'SH'
 #!/usr/bin/env sh
 set -e
 DIRNAME="$(cd "$(dirname "$0")" && pwd)"
@@ -79,7 +79,7 @@ SH
         run: |
           set -euo pipefail
           if [ ! -f ./gradlew.bat ]; then
-            cat > ./gradlew.bat <<'BAT'
+            cat > ./gradlew.bat << 'BAT'
 @echo off
 setlocal
 set SCRIPT_DIR=%~dp0
@@ -100,7 +100,7 @@ BAT
         run: |
           set -euo pipefail
           if [ ! -f ./settings.gradle.kts ]; then
-            cat > settings.gradle.kts <<'KTS'
+            cat > settings.gradle.kts << 'KTS'
 pluginManagement {
   includeBuild("build-logic")
   repositories {
@@ -143,7 +143,7 @@ KTS
       - name: Show status (debug)
         run: |
           echo "Files in repo root (preview):"
-          ls -la | sed -n '1,20p'
+          ls -la | head -20
           echo ""
           echo "gradle/wrapper contents:"
           ls -la gradle/wrapper || true
@@ -167,14 +167,8 @@ KTS
             echo "No changes to commit. Nothing to push."
             exit 0
           fi
-          git commit -m "chore: add Gradle wrapper (gradlew, gradlew.bat, gradle-wrapper.jar) and settings if missing" || true
-          if git push origin "HEAD:$BRANCH"; then
-            echo "Successfully pushed Gradle wrapper files to branch $BRANCH"
-          else
-            echo "Failed to push changes to branch $BRANCH. This may be due to branch protection rules."
-            echo "If push is blocked, create a PR manually with these changes or adjust protection temporarily."
-            exit 1
-          fi
+          git commit -m "chore: add Gradle wrapper (gradlew, gradlew.bat, gradle-wrapper.jar) and settings if missing"
+          git push origin "HEAD:$BRANCH"
 
       - name: Final info
         run: echo "Bootstrap job finished."
