@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+option java_package = "com.theya.datastore";
+option java_multiple_files = true;
+
+message SettingsPreferences {
+  int32 refresh_rate_ms = 1;
+  bool is_top_bar_visible = 2;
+  bool is_bottom_bar_visible = 3;
+  string theme_mode = 4;
+  string font_family = 5;
+  string blur_mode = 6;
+}
