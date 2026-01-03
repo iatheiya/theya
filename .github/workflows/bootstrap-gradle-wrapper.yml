@@ -17,7 +17,7 @@ jobs:
   bootstrap-wrapper:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository (allow pushing)
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           persist-credentials: true
@@ -32,28 +32,21 @@ jobs:
       - name: Ensure gradle/wrapper dir exists
         run: mkdir -p gradle/wrapper
 
-      - name: Download Gradle distribution and extract gradle-wrapper.jar (if missing)
+      - name: Download Gradle distribution and extract gradle-wrapper.jar
         run: |
           set -euo pipefail
           if [ ! -f gradle/wrapper/gradle-wrapper.jar ]; then
             echo "Downloading gradle-${GRADLE_VERSION}..."
             curl -sSLo gradle.zip "https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip"
             unzip -q gradle.zip
-            if [ -f "gradle-${GRADLE_VERSION}/lib/gradle-wrapper.jar" ]; then
-              cp "gradle-${GRADLE_VERSION}/lib/gradle-wrapper.jar" gradle/wrapper/gradle-wrapper.jar
-              echo "gradle-wrapper.jar installed to gradle/wrapper/"
-            else
-              echo "ERROR: gradle-wrapper.jar not found inside distribution." >&2
-              ls -la "gradle-${GRADLE_VERSION}" || true
-              rm -f gradle.zip || true
-              exit 1
-            fi
+            cp "gradle-${GRADLE_VERSION}/lib/gradle-wrapper.jar" gradle/wrapper/gradle-wrapper.jar
             rm -rf "gradle-${GRADLE_VERSION}" gradle.zip
+            echo "gradle-wrapper.jar installed"
           else
-            echo "gradle/wrapper/gradle-wrapper.jar already exists; skipping download."
+            echo "gradle-wrapper.jar already exists"
           fi
 
-      - name: Create gradlew (if missing)
+      - name: Create gradlew
         run: |
           set -euo pipefail
           if [ ! -f ./gradlew ]; then
@@ -63,19 +56,16 @@ set -e
 DIRNAME="$(cd "$(dirname "$0")" && pwd)"
 GRADLE_WRAPPER_JAR="$DIRNAME/gradle/wrapper/gradle-wrapper.jar"
 if [ ! -f "$GRADLE_WRAPPER_JAR" ]; then
-  echo "ERROR: gradle-wrapper.jar is missing at $GRADLE_WRAPPER_JAR"
-  echo "Please run: gradle wrapper --gradle-version 9.2.1"
+  echo "ERROR: gradle-wrapper.jar missing"
   exit 1
 fi
 exec java -jar "$GRADLE_WRAPPER_JAR" "$@"
 SH
             chmod +x ./gradlew
-            echo "Created ./gradlew"
-          else
-            echo "./gradlew already exists; skipping"
+            echo "Created gradlew"
           fi
 
-      - name: Create gradlew.bat (if missing)
+      - name: Create gradlew.bat
         run: |
           set -euo pipefail
           if [ ! -f ./gradlew.bat ]; then
@@ -85,18 +75,15 @@ setlocal
 set SCRIPT_DIR=%~dp0
 set GRADLE_WRAPPER_JAR=%SCRIPT_DIR%gradlewrappergradle-wrapper.jar
 if not exist "%GRADLE_WRAPPER_JAR%" (
-  echo ERROR: gradle-wrapper.jar is missing at %GRADLE_WRAPPER_JAR%
-  echo Run: gradle wrapper --gradle-version 9.2.1
+  echo ERROR: gradle-wrapper.jar missing
   exit /b 1
 )
 java -jar "%GRADLE_WRAPPER_JAR%" %*
 BAT
-            echo "Created ./gradlew.bat"
-          else
-            echo "./gradlew.bat already exists; skipping"
+            echo "Created gradlew.bat"
           fi
 
-      - name: Create minimal settings.gradle.kts if missing
+      - name: Create settings.gradle.kts
         run: |
           set -euo pipefail
           if [ ! -f ./settings.gradle.kts ]; then
@@ -109,7 +96,6 @@ pluginManagement {
     gradlePluginPortal()
   }
 }
-
 dependencyResolutionManagement {
   repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
   repositories {
@@ -117,9 +103,7 @@ dependencyResolutionManagement {
     mavenCentral()
   }
 }
-
 rootProject.name = "Theya"
-
 include(":app")
 include(":modules:system:glue-jni")
 include(":modules:core:common")
@@ -136,39 +120,20 @@ include(":modules:features:shell-setup")
 include(":modules:runtime:session-service")
 KTS
             echo "Created settings.gradle.kts"
-          else
-            echo "settings.gradle.kts already exists; skipping"
           fi
 
-      - name: Show status (debug)
+      - name: Package wrapper files as artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: gradle-wrapper-files
+          path: |
+            gradlew
+            gradlew.bat
+            gradle/wrapper/gradle-wrapper.jar
+            settings.gradle.kts
+
+      - name: Show generated files
         run: |
-          echo "Files in repo root (preview):"
-          ls -la | head -20
-          echo ""
-          echo "gradle/wrapper contents:"
-          ls -la gradle/wrapper || true
-
-      - name: Commit and push wrapper files (if any changes)
-        env:
-          GIT_AUTHOR_NAME: "github-actions[bot]"
-          GIT_AUTHOR_EMAIL: "41898282+github-actions[bot]@users.noreply.github.com"
-        run: |
-          set -euo pipefail
-          git config user.name "$GIT_AUTHOR_NAME"
-          git config user.email "$GIT_AUTHOR_EMAIL"
-          if [ -n "${GITHUB_HEAD_REF:-}" ]; then
-            BRANCH="$GITHUB_HEAD_REF"
-          else
-            BRANCH="${GITHUB_REF#refs/heads/}"
-          fi
-          echo "Target branch for push: $BRANCH"
-          git add gradlew gradlew.bat gradle/wrapper/gradle-wrapper.jar settings.gradle.kts || true
-          if git diff --staged --quiet; then
-            echo "No changes to commit. Nothing to push."
-            exit 0
-          fi
-          git commit -m "chore: add Gradle wrapper (gradlew, gradlew.bat, gradle-wrapper.jar) and settings if missing"
-          git push origin "HEAD:$BRANCH"
-
-      - name: Final info
-        run: echo "Bootstrap job finished."
+          echo "Generated files:"
+          ls -la gradlew gradlew.bat gradle/wrapper/gradle-wrapper.jar settings.gradle.kts || true
+          echo "Download artifacts from Actions tab to use these files"
