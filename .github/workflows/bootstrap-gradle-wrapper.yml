@@ -1,7 +1,7 @@
 name: Bootstrap Gradle Wrapper and Commit
 
 on:
-  workflow_dispatch:
+  workflow_dispatch: {}
   push:
     branches:
       - main
@@ -39,7 +39,7 @@ jobs:
           set -euo pipefail
           if [ ! -f gradle/wrapper/gradle-wrapper.jar ]; then
             echo "Downloading gradle-${GRADLE_VERSION}..."
-            curl -sSLo gradle.zip "https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip"
+            curl -fsSLo gradle.zip "https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip"
             if [ ! -f gradle.zip ]; then
               echo "ERROR: failed to download gradle distribution" >&2
               exit 1
@@ -63,7 +63,7 @@ jobs:
         run: |
           set -euo pipefail
           if [ ! -f ./gradlew ]; then
-            cat > ./gradlew <<'SH'
+            cat > ./gradlew <<'GRADLE_SH'
 #!/usr/bin/env sh
 set -e
 DIRNAME="$(cd "$(dirname "$0")" && pwd)"
@@ -74,7 +74,7 @@ if [ ! -f "$GRADLE_WRAPPER_JAR" ]; then
   exit 1
 fi
 exec java -jar "$GRADLE_WRAPPER_JAR" "$@"
-SH
+GRADLE_SH
             chmod +x ./gradlew
             echo "Created ./gradlew"
           else
@@ -85,7 +85,7 @@ SH
         run: |
           set -euo pipefail
           if [ ! -f ./gradlew.bat ]; then
-            cat > ./gradlew.bat <<'BAT'
+            cat > ./gradlew.bat <<'GRADLE_BAT'
 @echo off
 setlocal
 set SCRIPT_DIR=%~dp0
@@ -96,7 +96,7 @@ if not exist "%GRADLE_WRAPPER_JAR%" (
   exit /b 1
 )
 java -jar "%GRADLE_WRAPPER_JAR%" %*
-BAT
+GRADLE_BAT
             echo "Created ./gradlew.bat"
           else
             echo "./gradlew.bat already exists; skipping"
@@ -106,7 +106,7 @@ BAT
         run: |
           set -euo pipefail
           if [ ! -f ./settings.gradle.kts ]; then
-            cat > settings.gradle.kts <<'KTS'
+            cat > settings.gradle.kts <<'SETTINGS_KTS'
 pluginManagement {
     includeBuild("build-logic")
     repositories {
@@ -144,7 +144,7 @@ include(":modules:features:bridge-explorer")
 include(":modules:features:shell-setup")
 
 include(":modules:runtime:session-service")
-KTS
+SETTINGS_KTS
             echo "Created settings.gradle.kts"
           else
             echo "settings.gradle.kts already exists; skipping"
