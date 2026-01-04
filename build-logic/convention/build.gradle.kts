@@ -15,5 +15,5 @@ dependencies {
     compileOnly(libs.android.gradlePlugin)
     compileOnly(libs.kotlin.gradlePlugin)
     compileOnly(libs.hilt.android.gradlePlugin)
-    compileOnly(libs.rust.android.gradlePlugin)
+    compileOnly("org.mozilla.rust-android-gradle:plugin:0.9.6")
 }
