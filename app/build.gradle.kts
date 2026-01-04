@@ -1,7 +1,7 @@
 plugins {
     id("theya.android.application")
     id("theya.android.compose")
-    id("com.google.dagger.hilt.android")
+    id("theya.android.hilt")
 }
 
 android {
@@ -45,6 +45,4 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.navigation.compose)
-    implementation(libs.hilt.android)
-    kapt(libs.hilt.compiler)
 }
