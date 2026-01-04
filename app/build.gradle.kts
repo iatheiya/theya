@@ -41,8 +41,8 @@ dependencies {
     implementation(project(":modules:features:shell-setup"))
     implementation(project(":modules:runtime:session-service"))
 
-    implementation(libs.androidxCoreKtx)
-    implementation(libs.androidxLifecycleRuntimeKtx)
-    implementation(libs.androidxActivityCompose)
-    implementation(libs.androidxNavigationCompose)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.navigation.compose)
 }
