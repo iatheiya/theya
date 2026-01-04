@@ -2,6 +2,11 @@ plugins {
     `kotlin-dsl`
 }
 
+repositories {
+    google()
+    mavenCentral()
+}
+
 group = "com.theya.buildlogic"
 
 dependencies {
