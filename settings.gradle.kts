@@ -5,7 +5,7 @@ pluginManagement {
         mavenCentral()
         gradlePluginPortal()
         maven("https://maven.pkg.jetbrains.space/public/p/kotlin/p/dev")
-        maven("https://mozilla.github.io/rust-android-gradle/maven")
+        maven("https://oss.sonatype.org/content/repositories/snapshots")
     }
 }
 
@@ -15,6 +15,7 @@ dependencyResolutionManagement {
         mavenCentral()
         gradlePluginPortal()
         maven("https://maven.pkg.jetbrains.space/public/p/kotlin/p/dev")
+        maven("https://oss.sonatype.org/content/repositories/snapshots")
     }
 }
 
