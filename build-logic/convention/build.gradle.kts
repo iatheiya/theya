@@ -2,19 +2,11 @@ plugins {
     `kotlin-dsl`
 }
 
-repositories {
-    gradlePluginPortal()
-    maven("https://plugins.gradle.org/m2/")
-    google()
-    mavenCentral()
-    maven("https://jitpack.io")
-}
-
 group = "com.theya.buildlogic"
 
 dependencies {
-    implementation("com.android.tools.build:gradle:8.13.0")
-    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:2.3.0")
-    implementation("com.google.dagger:hilt-android-gradle-plugin:2.57.2")
-    implementation("org.mozilla.rust-android-gradle:plugin:0.9.6")
+    compileOnly(libs.android.gradlePlugin)
+    compileOnly(libs.kotlin.gradlePlugin)
+    compileOnly(libs.hilt.android.gradlePlugin)
+    compileOnly(libs.rust.android.gradlePlugin)
 }
