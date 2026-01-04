@@ -8,7 +8,7 @@ repositories {
     google()
     mavenCentral()
     maven("https://maven.pkg.jetbrains.space/public/p/kotlin/p/dev")
-    maven("https://raw.githubusercontent.com/mozilla/rust-android-gradle/main/maven")
+    maven("https://mozilla.github.io/rust-android-gradle/maven")
 }
 
 dependencies {
