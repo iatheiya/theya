@@ -1,3 +1,4 @@
+
 plugins {
     `kotlin-dsl`
 }
@@ -14,8 +15,8 @@ repositories {
 }
 
 dependencies {
-    compileOnly(libs.android.gradlePlugin)
-    compileOnly(libs.kotlin.gradlePlugin)
-    compileOnly(libs.hilt.android.gradlePlugin)
-    compileOnly(libs.rust.android.gradlePlugin)
+    implementation(libs.android.gradlePlugin)
+    implementation(libs.kotlin.gradlePlugin)
+    implementation(libs.hilt.android.gradlePlugin)
+    implementation(libs.rust.android.gradlePlugin)
 }
