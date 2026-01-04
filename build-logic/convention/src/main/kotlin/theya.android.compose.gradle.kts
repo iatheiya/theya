@@ -5,11 +5,7 @@ import org.gradle.kotlin.dsl.findByType
 
 val commonExtension = extensions.findByType<CommonExtension<*, *, *, *, *, *>>()
 
-if (commonExtension == null) {
-    error("Android extension not found. Ensure 'theya.android.application' or 'theya.android.library' is applied before 'theya.android.compose'.")
-}
-
-commonExtension.apply {
+commonExtension?.apply {
     buildFeatures {
         compose = true
     }
