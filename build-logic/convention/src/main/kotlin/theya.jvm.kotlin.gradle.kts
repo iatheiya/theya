@@ -1,12 +1,3 @@
-import org.gradle.api.Plugin
-import org.gradle.api.Project
-
-class JvmKotlinConventionPlugin : Plugin<Project> {
-    override fun apply(target: Project) {
-        with(target) {
-            with(pluginManager) {
-                apply("org.jetbrains.kotlin.jvm")
-            }
-        }
-    }
+plugins {
+    id("org.jetbrains.kotlin.jvm")
 }
