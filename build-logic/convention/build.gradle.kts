@@ -8,4 +8,6 @@ dependencies {
     implementation(libs.android.gradlePlugin)
     implementation(libs.kotlin.gradlePlugin)
     implementation(libs.hilt.android.gradlePlugin)
+
+implementation(libs.rustAndroid.gradlePlugin)
 }
