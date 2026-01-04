@@ -5,8 +5,7 @@ pluginManagement {
         mavenCentral()
         gradlePluginPortal()
         maven("https://plugins.gradle.org/m2/")
-        // ИСПРАВЛЕНИЕ: Добавлен репозиторий JetBrains для поиска новейших версий Kotlin (2.2.20).
-        maven("https://maven.pkg.jetbrains.space/public/p/kotlin/p/dev")
+         maven("https://maven.pkg.jetbrains.space/public/p/kotlin/p/dev")
     }
 }
 
