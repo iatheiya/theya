@@ -5,7 +5,7 @@ pluginManagement {
         mavenCentral()
         gradlePluginPortal()
         maven("https://maven.pkg.jetbrains.space/public/p/kotlin/p/dev")
-        maven("https://maven.mozilla.org/")
+        maven("https://raw.githubusercontent.com/mozilla/rust-android-gradle/main/maven")
     }
 }
 
