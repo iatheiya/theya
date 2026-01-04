@@ -13,8 +13,8 @@ repositories {
 group = "com.theya.buildlogic"
 
 dependencies {
-    implementation(libs.android.gradlePlugin)
-    implementation(libs.kotlin.gradlePlugin)
-    implementation(libs.hilt.android.gradlePlugin)
+    implementation("com.android.tools.build:gradle:8.13.0")
+    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:2.3.0")
+    implementation("com.google.dagger:hilt-android-gradle-plugin:2.57.2")
     implementation("org.mozilla.rust-android-gradle:plugin:0.9.6")
 }
