@@ -1,7 +1,4 @@
 import com.android.build.api.dsl.CommonExtension
-import org.gradle.api.Project
-import org.gradle.kotlin.dsl.dependencies
-import org.gradle.kotlin.dsl.findByType
 
 val commonExtension = extensions.findByType<CommonExtension<*, *, *, *, *, *>>()
 
