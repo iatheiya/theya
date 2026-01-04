@@ -25,7 +25,7 @@ jobs:
           gradle-version: '9.2.1'
 
       - name: Generate Gradle wrapper
-        run: gradle wrapper --gradle-version 9.2.1 --no-daemon --stacktrace
+        run: gradle wrapper --gradle-version 9.2.1 --no-daemon --stacktrace --rerun-tasks --info
 
       - name: Verify generated files
         run: |
