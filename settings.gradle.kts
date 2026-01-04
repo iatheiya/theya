@@ -19,11 +19,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "Theya"
 
-includeBuild("build-logic") {
-    sourceCatalogs {
-        from(settings.dependencyResolutionManagement.versionCatalogs.getByName("libs"))
-    }
-}
+includeBuild("build-logic")
 
 include(":app")
 include(":modules:system:glue-jni")
