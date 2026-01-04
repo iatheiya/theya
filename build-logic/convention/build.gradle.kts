@@ -1,5 +1,6 @@
 plugins {
     `kotlin-dsl`
+    alias(libs.plugins.jetbrains.kotlin.jvm)
 }
 
 group = "com.theya.buildlogic"
