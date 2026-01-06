@@ -9,6 +9,9 @@ on:
 jobs:
   generate:
     runs-on: ubuntu-latest
+    env:
+      GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.vfs.watch=false
+      GRADLE_USER_HOME: ~/.gradle
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -19,13 +22,24 @@ jobs:
           distribution: temurin
           java-version: '17'
 
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
       - name: Setup Gradle CLI
         uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: '9.2.1'
 
       - name: Generate Gradle wrapper
-        run: gradle wrapper --gradle-version 9.2.1 --no-daemon --stacktrace --rerun-tasks --info
+        run: |
+          gradle wrapper --gradle-version 9.2.1 --stacktrace --rerun-tasks --info
 
       - name: Verify generated files
         run: |
