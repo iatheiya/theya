@@ -1,6 +1,6 @@
 plugins {
-    id("com.android.library")
-    id("org.jetbrains.kotlin.android")
+    id("com.android.library") version "8.2.2"
+    id("org.jetbrains.kotlin.android") version "1.9.20"
     id("org.mozilla.rust-android-gradle.rust-android") version "0.9.3"
 }
 
