@@ -1,8 +1,10 @@
-use log::{Record, Level, Metadata};
+use log::{Record, Level, Metadata, Log};
+
+static LOGGER: SimpleLogger = SimpleLogger;
 
 struct SimpleLogger;
 
-impl log::Log for SimpleLogger {
+impl Log for SimpleLogger {
     fn enabled(&self, metadata: &Metadata) -> bool {
         metadata.level() <= Level::Info
     }
@@ -17,6 +19,6 @@ impl log::Log for SimpleLogger {
 }
 
 pub fn init() {
-    let _ = log::set_logger(&SimpleLogger);
+    log::set_logger(&LOGGER).unwrap_or(());
     log::set_max_level(Level::Info.to_level_filter());
 }
