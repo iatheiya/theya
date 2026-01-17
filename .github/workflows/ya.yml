@@ -30,6 +30,11 @@ jobs:
         with:
           distribution: temurin
           java-version: ${{ env.JAVA_VERSION }}
+      - uses: android-actions/setup-android@v3
+        with:
+          cmdline-tools-version: 11076708
+      - name: install-ndk
+        run: yes | sdkmanager "ndk;26.1.10909125"
       - uses: gradle/actions/setup-gradle@v3
       - run: chmod +x ./gradlew
       - name: prepare-emulator-logs
@@ -87,6 +92,8 @@ jobs:
       - uses: android-actions/setup-android@v3
         with:
           cmdline-tools-version: 11076708
+      - name: install-ndk
+        run: yes | sdkmanager "ndk;26.1.10909125"
       - run: chmod +x ./gradlew
       - name: prepare-keystore
         run: |
