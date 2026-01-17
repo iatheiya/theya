@@ -1,11 +1,12 @@
 namespace theya_engine {
     void init_engine();
+
     [Throws=EngineError]
     u32 create_session(string command);
 };
 
 [Error]
 enum EngineError {
-    "IoError",
-    "ProcessError"
+    IoError(string message),
+    ProcessError(string message)
 };
