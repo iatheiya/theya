@@ -1,8 +1,19 @@
 #!/usr/bin/env bash
-set -e -o pipefail
+set -euo pipefail
 
 LOG_DIR="emulator_logs"
 mkdir -p "$LOG_DIR"
+
+collect_on_exit() {
+  adb devices -l > "$LOG_DIR/adb_devices_exit.txt" 2>&1 || true
+  adb logcat -d > "$LOG_DIR/logcat.txt" 2>&1 || true
+  adb shell dumpsys activity > "$LOG_DIR/activity_dump.txt" 2>&1 || true
+  if [ -n "${PKG:-}" ]; then
+    adb shell dumpsys meminfo "${PKG}" > "$LOG_DIR/meminfo.txt" 2>&1 || true
+  fi
+}
+
+trap collect_on_exit EXIT
 
 command -v adb >/dev/null 2>&1 && adb --version 2>&1 | sed -n '1,20p' > "$LOG_DIR/adb_version.txt" || echo "adb_missing" > "$LOG_DIR/adb_version.txt"
 command -v aapt2 >/dev/null 2>&1 && aapt2 version 2>&1 | sed -n '1,20p' > "$LOG_DIR/aapt2_version.txt" || echo "aapt2_missing" > "$LOG_DIR/aapt2_version.txt"
@@ -15,7 +26,8 @@ retry_count=0
 
 while [ "$retry_count" -lt "$max_retries" ]; do
   boot_completed=$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')
-  if [ "$boot_completed" == "1" ]; then
+  anim_stopped=$(adb shell getprop init.svc.bootanim 2>/dev/null | tr -d '\r')
+  if [ "$boot_completed" = "1" ] && [ "$anim_stopped" = "stopped" ]; then
     break
   fi
   sleep 1
@@ -34,7 +46,10 @@ if [ -z "${APK_PATH:-}" ]; then
   exit 1
 fi
 
-adb install -r "$APK_PATH" > "$LOG_DIR/install_log.txt" 2>&1 || true
+if ! adb install -r "$APK_PATH" > "$LOG_DIR/install_log.txt" 2>&1; then
+  echo "INSTALL_FAILED" > "$LOG_DIR/install_error.txt"
+  exit 1
+fi
 
 AAPT2="$(command -v aapt2 || true)"
 AAPT="$(command -v aapt || true)"
@@ -42,11 +57,11 @@ PKG=""
 MAINACT=""
 
 if [ -n "$AAPT2" ]; then
-  PKG="$($AAPT2 dump badging "$APK_PATH" 2>/dev/null | awk -F"'" '/package: name=/{print $2; exit}' || true)"
-  MAINACT="$($AAPT2 dump badging "$APK_PATH" 2>/dev/null | awk -F"'" '/launchable-activity: name=/{print $2; exit}' || true)"
+  PKG="$($AAPT2 dump badging "$APK_PATH" 2>/dev/null | awk -F\"'\" '/package: name=/{print $2; exit}' || true)"
+  MAINACT="$($AAPT2 dump badging "$APK_PATH" 2>/dev/null | awk -F\"'\" '/launchable-activity: name=/{print $2; exit}' || true)"
 elif [ -n "$AAPT" ]; then
-  PKG="$($AAPT dump badging "$APK_PATH" 2>/dev/null | awk -F"'" '/package: name=/{print $2; exit}' || true)"
-  MAINACT="$($AAPT dump badging "$APK_PATH" 2>/dev/null | awk -F"'" '/launchable-activity: name=/{print $2; exit}' || true)"
+  PKG="$($AAPT dump badging "$APK_PATH" 2>/dev/null | awk -F\"'\" '/package: name=/{print $2; exit}' || true)"
+  MAINACT="$($AAPT dump badging "$APK_PATH" 2>/dev/null | awk -F\"'\" '/launchable-activity: name=/{print $2; exit}' || true)"
 fi
 
 if [ -z "$PKG" ]; then
@@ -56,19 +71,23 @@ fi
 echo "PKG=${PKG}" > "$LOG_DIR/pkg.txt"
 echo "MAINACT=${MAINACT}" >> "$LOG_DIR/pkg.txt"
 
+adb logcat -c || true
+
 if [ -n "$PKG" ]; then
   if [ -n "$MAINACT" ]; then
-    adb shell am start -n "${PKG}/${MAINACT}" > "$LOG_DIR/launch_log.txt" 2>&1 || true
+    adb shell am start -W -n "${PKG}/${MAINACT}" > "$LOG_DIR/launch_log.txt" 2>&1 || true
   else
     adb shell monkey -p "${PKG}" -c android.intent.category.LAUNCHER 1 > "$LOG_DIR/launch_log.txt" 2>&1 || true
   fi
 
   sleep 10
+
   adb shell screencap -p /sdcard/screen_light.png
   adb pull /sdcard/screen_light.png "$LOG_DIR/screen_light.png" || true
 
-  adb shell settings put secure ui_night_mode 2
+  adb shell cmd uimode night yes
   sleep 5
+
   adb shell screencap -p /sdcard/screen_dark.png
   adb pull /sdcard/screen_dark.png "$LOG_DIR/screen_dark.png" || true
 
@@ -87,5 +106,4 @@ else
 fi
 
 adb devices -l > "$LOG_DIR/adb_devices_after.txt" || true
-
 exit 0
