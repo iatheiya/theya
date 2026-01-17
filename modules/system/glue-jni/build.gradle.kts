@@ -7,6 +7,7 @@ plugins {
 android {
     namespace = "com.theya.glue"
     compileSdk = 35
+    ndkVersion = "26.1.10909125"
 
     defaultConfig {
         minSdk = 26
