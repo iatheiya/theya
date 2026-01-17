@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
-    alias(libs.plugins.mozilla.rust.android)
+    alias(libs.plugins.android.rust)
 }
 
 android {
@@ -26,7 +26,7 @@ android {
     }
 }
 
-cargo {
+androidRust {
     module = "../engine-rs"
     libname = "theya_engine"
     targets = listOf("arm", "arm64", "x86", "x86_64")
