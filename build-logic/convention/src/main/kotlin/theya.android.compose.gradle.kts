@@ -6,17 +6,13 @@ commonExtension?.apply {
     buildFeatures {
         compose = true
     }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.findVersion("kotlin").get().toString()
-    }
 }
 
 dependencies {
     val bom = libs.findLibrary("androidx.compose.bom").get()
     add("implementation", platform(bom))
     add("androidTestImplementation", platform(bom))
-    
+
     add("implementation", libs.findLibrary("androidx.ui").get())
     add("implementation", libs.findLibrary("androidx.ui.graphics").get())
     add("implementation", libs.findLibrary("androidx.ui.tooling.preview").get())
