@@ -8,7 +8,7 @@ plugins {
 
 android {
     namespace = "com.theya.terminal"
-    compileSdk = 36
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 26
