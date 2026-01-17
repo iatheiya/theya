@@ -5,9 +5,12 @@ plugins {
 
 group = "com.theya.buildlogic"
 
-versionCatalogs {
-    create("libs") {
-        from(files("../../gradle/libs.versions.toml"))
+@Suppress("UnstableApiUsage")
+dependencyResolutionManagement {
+    versionCatalogs {
+        create("libs") {
+            from(files(layout.projectDirectory.file("../../gradle/libs.versions.toml")))
+        }
     }
 }
 
