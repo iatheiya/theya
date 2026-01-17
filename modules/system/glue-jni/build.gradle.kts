@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
-    id("org.mozilla.rust-android-gradle.rust-android") version "0.9.6"
+    id("io.github.MatrixDev.android‑rust") version "0.5.0"
 }
 
 android {
