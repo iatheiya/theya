@@ -1,23 +1,49 @@
 plugins {
-    `kotlin-dsl`
+    id("org.jetbrains.kotlin.jvm") version "2.3.0"
+    id("java-gradle-plugin")
 }
 
 group = "com.theya.buildlogic"
+
+versionCatalogs {
+    create("libs") {
+        from(files("../../gradle/libs.versions.toml"))
+    }
+}
 
 kotlin {
     jvmToolchain(17)
 }
 
 dependencies {
-    implementation("com.android.tools.build:gradle:8.13.0")
-    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:2.3.0")
-    implementation("com.google.dagger:hilt-android-gradle-plugin:2.57.2")
+    compileOnly(gradleApi())
+    implementation(libs.android.gradlePlugin)
+    implementation(libs.kotlin.gradlePlugin)
+    implementation(libs.hilt.gradlePlugin)
+    implementation(libs.kotlin.compose.compiler.plugin)
 }
 
-configurations.all {
-    resolutionStrategy.eachDependency {
-        if (requested.group == "org.jetbrains.kotlin") {
-            useVersion("2.3.0")
+gradlePlugin {
+    plugins {
+        create("androidApplication") {
+            id = "theya.android.application"
+            implementationClass = "com.theya.buildlogic.AndroidApplicationConventionPlugin"
+        }
+        create("androidLibrary") {
+            id = "theya.android.library"
+            implementationClass = "com.theya.buildlogic.AndroidLibraryConventionPlugin"
+        }
+        create("androidCompose") {
+            id = "theya.android.compose"
+            implementationClass = "com.theya.buildlogic.AndroidComposeConventionPlugin"
+        }
+        create("androidHilt") {
+            id = "theya.android.hilt"
+            implementationClass = "com.theya.buildlogic.AndroidHiltConventionPlugin"
+        }
+        create("jvmKotlin") {
+            id = "theya.jvm.kotlin"
+            implementationClass = "com.theya.buildlogic.JvmKotlinConventionPlugin"
         }
     }
 }
