@@ -5,7 +5,7 @@ set GRADLE_WRAPPER_JAR=%~dp0gradle\wrapper\gradle-wrapper.jar
 
 if not exist "%GRADLE_WRAPPER_JAR%" (
   echo ERROR: gradle-wrapper.jar is missing
-  echo Run: gradle wrapper --gradle-version 9.2.1
+  echo Run: gradle wrapper --gradle-version 9.3.0
   exit /b 1
 )
 
