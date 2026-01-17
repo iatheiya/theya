@@ -27,10 +27,10 @@ android {
 }
 
 androidRust {
-    module("../engine-rs")
-    libraryName("theya_engine")
-    targets(listOf("arm", "arm64", "x86", "x86_64"))
-    profile("release")
+    modulePath.set("../engine-rs")
+    libName.set("theya_engine")
+    targets.set(listOf("arm", "arm64", "x86", "x86_64"))
+    buildType.set("release")
 }
 
 dependencies {
