@@ -11,7 +11,7 @@ GRADLE_WRAPPER_JAR="$(dirname "$0")/gradle/wrapper/gradle-wrapper.jar"
 
 if [ ! -f "$GRADLE_WRAPPER_JAR" ]; then
   echo "ERROR: gradle-wrapper.jar is missing"
-  echo "Run: gradle wrapper --gradle-version 9.2.1"
+  echo "Run: gradle wrapper --gradle-version 9.3.0"
   exit 1
 fi
 
