@@ -43,7 +43,8 @@ jobs:
 
       - name: Generate Gradle wrapper
         run: |
-          gradle wrapper --gradle-version 9.3.0 --rerun-tasks --warn --stacktrace
+          gradle wrapper --gradle-version 9.3.0 --rerun-tasks --warn --stacktrace --continue
+        continue-on-error: true
 
       - name: Verify generated files
         run: |
