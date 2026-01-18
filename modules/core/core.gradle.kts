@@ -4,6 +4,7 @@ plugins {
 }
 
 android {
+    namespace = "com.theya.core.common"
     compileSdk = 35
 
     defaultConfig {
