@@ -17,6 +17,7 @@ class SessionService : Service() {
 
     override fun onCreate() {
         super.onCreate()
+        binder.setService(this)
         lifecycleController.startForeground(this)
     }
 
