@@ -11,10 +11,10 @@ kotlin {
 
 dependencies {
     compileOnly(gradleApi())
-    compileOnly(libs.androidGradlePlugin)
-    compileOnly(libs.kotlinGradlePlugin)
-    compileOnly(libs.hiltGradlePlugin)
-    compileOnly(libs.kotlinComposeCompilerPlugin)
+    compileOnly(libs.android.gradle.plugin)
+    compileOnly(libs.kotlin.gradle.plugin)
+    compileOnly(libs.hilt.gradle.plugin)
+    compileOnly(libs.kotlin.compose.compiler.plugin)
 }
 
 gradlePlugin {
