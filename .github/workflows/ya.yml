@@ -33,6 +33,7 @@ jobs:
       - uses: android-actions/setup-android@v3
         with:
           cmdline-tools-version: 11076708
+          accept-android-sdk-licenses: true
       - name: install-ndk
         run: yes | sdkmanager "ndk;26.1.10909125"
       - uses: gradle/actions/setup-gradle@v3
@@ -92,6 +93,7 @@ jobs:
       - uses: android-actions/setup-android@v3
         with:
           cmdline-tools-version: 11076708
+          accept-android-sdk-licenses: true
       - name: install-ndk
         run: yes | sdkmanager "ndk;26.1.10909125"
       - run: chmod +x ./gradlew
@@ -188,6 +190,7 @@ jobs:
       - uses: android-actions/setup-android@v3
         with:
           cmdline-tools-version: 11076708
+          accept-android-sdk-licenses: true
       - uses: actions/download-artifact@v4
         with:
           name: diagnostics-data
