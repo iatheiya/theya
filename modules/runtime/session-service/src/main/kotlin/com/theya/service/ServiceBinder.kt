@@ -4,8 +4,13 @@ import android.os.Binder
 import javax.inject.Inject
 
 class ServiceBinder @Inject constructor() : Binder() {
-    fun getService(): SessionService {
-        // Return service instance or interface
-        return SessionService() 
+    private var serviceInstance: SessionService? = null
+
+    fun setService(service: SessionService) {
+        serviceInstance = service
+    }
+
+    fun getService(): SessionService? {
+        return serviceInstance
     }
 }
