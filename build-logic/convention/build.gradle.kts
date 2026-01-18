@@ -1,5 +1,5 @@
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "2.3.0"
+    alias(libs.plugins.jetbrains-kotlin-jvm)
     id("java-gradle-plugin")
 }
 
@@ -11,10 +11,10 @@ kotlin {
 
 dependencies {
     compileOnly(gradleApi())
-    implementation(libs.android.gradlePlugin)
-    implementation(libs.kotlin.gradlePlugin)
-    implementation(libs.hilt.gradlePlugin)
-    implementation(libs.kotlin.compose.compiler.plugin)
+    compileOnly(libs.android.gradlePlugin)
+    compileOnly(libs.kotlin.gradlePlugin)
+    compileOnly(libs.hilt.gradlePlugin)
+    compileOnly(libs.kotlin.compose.compiler.plugin)
 }
 
 gradlePlugin {
