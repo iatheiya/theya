@@ -5,6 +5,6 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.jvm) apply false
     alias(libs.plugins.jetbrains.compose.compiler) apply false
     alias(libs.plugins.hilt.android) apply false
-    alias(libs.plugins.jetbrains.kotlin.kapt) apply false
+    alias(libs.plugins.google.devtools.ksp) apply false
     alias(libs.plugins.android.rust) apply false
 }
