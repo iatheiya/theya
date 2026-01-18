@@ -1,6 +1,6 @@
 plugins {
-    alias(libs.plugins.jetbrains.kotlin.jvm)
-    id("java.gradle.plugin")
+    id("org.jetbrains.kotlin.jvm") version "2.3.0"
+    id("java-gradle-plugin")
 }
 
 group = "com.theya.buildlogic"
@@ -11,10 +11,10 @@ kotlin {
 
 dependencies {
     compileOnly(gradleApi())
-    compileOnly(libs.android.gradle.plugin)
-    compileOnly(libs.kotlin.gradle.plugin)
-    compileOnly(libs.hilt.gradle.plugin)
-    compileOnly(libs.kotlin.compose.compiler.plugin)
+    compileOnly("com.android.tools.build:gradle:9.0.0")
+    compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin:2.3.0")
+    compileOnly("com.google.dagger:hilt-android-gradle-plugin:2.58.0")
+    compileOnly("org.jetbrains.kotlin:compose-compiler-gradle-plugin:2.3.0")
 }
 
 gradlePlugin {
