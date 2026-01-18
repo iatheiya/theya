@@ -7,4 +7,5 @@ plugins {
     alias(libs.plugins.hilt.android) apply false
     alias(libs.plugins.google.devtools.ksp) apply false
     alias(libs.plugins.android.rust) apply false
+    id("com.google.protobuf") version "0.9.4" apply false
 }
