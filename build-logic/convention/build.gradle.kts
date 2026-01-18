@@ -1,6 +1,6 @@
 plugins {
     alias(libs.plugins.jetbrains.kotlin.jvm)
-    id("java-gradle-plugin")
+    id("java.gradle.plugin")
 }
 
 group = "com.theya.buildlogic"
